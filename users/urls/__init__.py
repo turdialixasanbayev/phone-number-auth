@@ -9,5 +9,9 @@ urlpatterns = [
     path(
         'base/',
         include('users.urls.base')
+    ),
+    path(
+        'settings/',
+        include('users.urls.settings')
     )
 ]
