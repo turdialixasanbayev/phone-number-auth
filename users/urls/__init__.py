@@ -5,5 +5,9 @@ urlpatterns = [
     path(
         'auth/',
         include('users.urls.auth')
+    ),
+    path(
+        'base/',
+        include('users.urls.base')
     )
 ]
