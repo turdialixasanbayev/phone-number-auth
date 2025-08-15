@@ -53,10 +53,8 @@
         <h1>Welcome, {{ user.phone_number }} 👋</h1>
         <p>You are successfully logged in.</p>
         <a href="{% url 'logout' %}" class="button">Logout</a>
-        <a href="#" class="button">Change Phone Number</a>
-        <a href="#" class="button">Change Password</a>
-        <a href="#" class="button">Delete Account</a>
-        <a href="#" class="button">Restore Account</a>
+        <a href="{% url 'update' %}" class="button">Update Profile</a>
+        <a href="{% url 'delete' %}" class="button">Delete Profile</a>
         {% else %}
         <h1>Welcome to {{ site_name }} 🌐</h1>
         <p>Please log in or create an account to continue.</p>
