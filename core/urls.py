@@ -26,7 +26,7 @@ urlpatterns = [
     path('phone-number-auth/', admin.site.urls),
 
     path(
-        'users/',
+        '',
         include('users.urls')
     ),
 

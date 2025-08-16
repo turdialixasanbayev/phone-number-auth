@@ -11,5 +11,5 @@ urlpatterns = [
     path("profile/update/", update_profile, name="update"),
     path("profile/deactivate/", deactivate_account, name="deactivate"),
     path("profile/reactivate/<int:user_id>/",
-         reactivate_account, name="reactivate"),
+        reactivate_account, name="reactivate"),
 ]
