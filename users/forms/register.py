@@ -6,6 +6,11 @@ User = get_user_model()
 
 
 class RegisterForm(forms.ModelForm):
+    phone_number = forms.CharField(
+        label="Phone Number",
+        max_length=15,
+        widget=forms.TextInput(attrs={"placeholder": "Enter phone number"})
+    )
     password1 = forms.CharField(
         label="Password",
         widget=forms.PasswordInput(attrs={"placeholder": "Enter password"})
