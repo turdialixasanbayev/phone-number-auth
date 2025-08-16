@@ -4,6 +4,7 @@ from django.shortcuts import redirect
 from users.forms.login import PhoneLoginForm
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse_lazy
+from django.contrib import messages
 
 
 class CustomLoginView(LoginView):
@@ -17,4 +18,5 @@ class CustomLoginView(LoginView):
 @login_required
 def logout_view(request):
     logout(request)
+    messages.success(request, "You have been logged out.")
     return redirect("home")

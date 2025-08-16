@@ -19,6 +19,7 @@ class CustomUserAdmin(UserAdmin):
     list_display = (
         'id',
         'phone_number',
+        'status',
         'is_active',
         'is_staff',
         'is_superuser',
@@ -33,7 +34,8 @@ class CustomUserAdmin(UserAdmin):
     list_filter = (
         'is_active',
         'is_staff',
-        'is_superuser'
+        'is_superuser',
+        'status'
     )
     fieldsets = (
         ('Login', {
@@ -41,7 +43,7 @@ class CustomUserAdmin(UserAdmin):
             'classes': ('wide'),
         }),
         ("Permissions", {
-            'fields': ('is_superuser', 'is_staff', 'is_active'),
+            'fields': ('is_superuser', 'is_staff', 'is_active', 'status'),
             'classes': ('wide'),
         }),
         ("Important Dates", {

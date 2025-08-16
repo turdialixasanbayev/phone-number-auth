@@ -52,9 +52,17 @@
         {% if user.is_authenticated %}
         <h1>Welcome, {{ user.phone_number }} 👋</h1>
         <p>You are successfully logged in.</p>
+
         <a href="{% url 'logout' %}" class="button">Logout</a>
         <a href="{% url 'update' %}" class="button">Update Profile</a>
         <a href="{% url 'delete' %}" class="button">Delete Profile</a>
+
+        {% if user.status == 'active' %}
+        <a href="{% url 'deactivate' %}" class="button">Deactivate Account</a>
+        {% elif user.status == 'deactive' %}
+        <a href="{% url 'reactivate' user.id %}" class="button">Reactivate Account</a>
+        {% endif %}
+
         {% else %}
         <h1>Welcome to {{ site_name }} 🌐</h1>
         <p>Please log in or create an account to continue.</p>
@@ -62,6 +70,7 @@
         <a href="{% url 'register' %}" class="button">Register</a>
         {% endif %}
     </header>
+
     <footer>
         <p>&copy; {{ current_year }} {{ site_name }} - All Rights Reserved</p>
     </footer>

@@ -4,11 +4,16 @@ from .managers import CustomUserManager
 
 
 class CustomUser(AbstractUser):
+    STATUS = (
+        ('active', 'Active'),
+        ('deactive', 'Deactive')
+    )
     username = None
     first_name = None
     last_name = None
     email = None
     phone_number = models.CharField(max_length=15, unique=True)
+    status = models.CharField(max_length=10, choices=STATUS, default='active')
 
     objects = CustomUserManager()
 
