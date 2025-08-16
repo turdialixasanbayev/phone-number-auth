@@ -8,6 +8,6 @@ from django.contrib.auth import logout
 def delete_account(request):
     user = request.user
     logout(request)
-    user.delete() # HARD DELETE
+    user.delete()  # HARD DELETE
     messages.success(request, "Your account has been permanently deleted.")
     return redirect("home")

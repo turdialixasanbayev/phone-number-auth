@@ -11,7 +11,7 @@ urlpatterns = [
         include('users.urls.base')
     ),
     path(
-        'settings/',
-        include('users.urls.settings')
+        'profile/',
+        include('users.urls.profile')
     )
 ]

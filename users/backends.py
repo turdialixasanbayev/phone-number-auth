@@ -9,6 +9,7 @@ class PhoneBackend(ModelBackend):
     """
     Authenticate user by phone number instead of username.
     """
+
     def authenticate(self, request, phone_number=None, password=None, **kwargs):
         print("📞 PhoneBackend ishlayapti!")
 
@@ -26,4 +27,3 @@ class PhoneBackend(ModelBackend):
         else:
             print("❌ Parol noto'g'ri")
         return None
-    

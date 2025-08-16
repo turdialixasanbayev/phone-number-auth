@@ -15,5 +15,6 @@ def reactivate_account(request, user_id):
         user.save()
         messages.success(request, "Your account has been reactivated.")
     except Exception as e:
-        messages.error(request, "An error occurred while reactivating your account.")
+        messages.error(
+            request, "An error occurred while reactivating your account.")
     return redirect("home")

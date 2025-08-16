@@ -21,9 +21,10 @@ def update_profile(request):
             # Agar foydalanuvchi current phone_number ham kiritgan bo'lsa
             if current_phone:
                 if current_phone != user.phone_number:
-                    messages.error(request, "Current phone number is incorrect ❌")
+                    messages.error(
+                        request, "Current phone number is incorrect ❌")
                     return redirect("update")
-            
+
             # Telefon raqam formati tekshirish (oddiy misol: faqat raqamlar va +)
             if not re.match(r'^\+?\d{9,15}$', new_phone):
                 messages.error(request, "Invalid phone number format ❌")
@@ -32,9 +33,7 @@ def update_profile(request):
             # Agar boshqa userda shu raqam mavjud bo'lsa
             from django.contrib.auth import get_user_model
 
-
             User = get_user_model()
-
 
             if User.objects.exclude(id=user.id).filter(phone_number=new_phone).exists():
                 messages.error(request, "This phone number is already taken ❌")
@@ -45,7 +44,8 @@ def update_profile(request):
         # ✅ Parolni yangilash
         if new_password or confirm_password:
             if not current_password:
-                messages.error(request, "Please enter your current password to change password ❌")
+                messages.error(
+                    request, "Please enter your current password to change password ❌")
                 return redirect("update")
 
             if not user.check_password(current_password):
@@ -57,19 +57,23 @@ def update_profile(request):
                 return redirect("update")
 
             if len(new_password) < 3:
-                messages.error(request, "New password must be at least 3 characters ❌")
+                messages.error(
+                    request, "New password must be at least 3 characters ❌")
                 return redirect("update")
 
             if new_password != confirm_password:
-                messages.error(request, "New password and confirm password do not match ❌")
+                messages.error(
+                    request, "New password and confirm password do not match ❌")
                 return redirect("update")
 
             user.set_password(new_password)
-            update_session_auth_hash(request, user)  # Logout bo‘lib qolmaslik uchun
+            # Logout bo‘lib qolmaslik uchun
+            update_session_auth_hash(request, user)
 
         # ✅ Foydalanuvchini saqlash
         user.save()
-        messages.success(request, "Your profile has been updated successfully ✅")
+        messages.success(
+            request, "Your profile has been updated successfully ✅")
         return redirect("home")
 
     return render(request, "users/update_profile.html")
