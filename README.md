@@ -1,47 +1,50 @@
-# Phone Number Authentication (Django)
+# 📱 Phone Number Authentication (Django)
 
-A minimal, production-ready example of authenticating users **by phone number** in Django.  
-It ships with a custom user model, a custom authentication backend, and simple templates for sign‑up, log‑in, profile update, and delete.
+A clean, production‑ready Django starter that authenticates **by phone number** (no username or email required).  
+It ships with a **custom user model**, a **custom authentication backend** for `phone_number + password`, and modern templates for register, login, profile update, deactivate/reactivate, and delete. Internationalization (i18n) is built‑in, with an **optional** section for `django-modeltranslation` if you also need to translate **database fields**.
+
+> Built and maintained by **Turdiali Xasanbayev (@turdialixasanbayev)** — Backend Developer. PRs and issues are welcome!
 
 ---
 
 ## ✨ Features
 
-- **Phone‑number–first auth flow** (no username/email required).
-- **Custom user model** with `phone_number` as the unique identifier.
-- **Custom authentication backend** to authenticate via phone + password.
-- **CRUD for the profile**: register, login, update password/phone, delete.
-- **Server‑rendered templates** for a clean, minimal UI.
-- Works out-of-the-box with **SQLite** for local development.
-
-> Note: If you need OTP/SMS verification, you can integrate providers like Twilio or PlayMobile later. This project focuses on password-based login via phone number.
+- 🔐 Phone‑number–first auth flow (no username/email)
+- 👤 `CustomUser` model with unique `phone_number`
+- 🔑 Custom `PhoneBackend` (authenticate via `phone_number + password`)
+- 🧭 Templates: Home, Register, Login, Update Profile, Deactivate/Reactivate, Delete
+- 🌍 i18n ready (Uzbek/English/Russian/Turkish examples)
+- 🧰 Scripts folder for local helpers (make them executable)
+- 🧪 Easily extendable: OTP/SMS, DRF API, tests, rate‑limit, etc.
 
 ---
 
-## 🧱 Project Structure
+## 🗂 Project Structure
 
 ```
 phone-number-auth/
-├─ core/                 # Django project (settings, urls, wsgi/asgi)
-├─ users/                # App with CustomUser model, auth backend, forms, views
-├─ templates/            # HTML templates (register, login, update, delete, home)
-├─ requirements/         # (Optional) requirements files for environments
+├─ core/                 # Project settings, urls, wsgi/asgi
+├─ users/                # CustomUser model, auth backend, forms/views/urls
+├─ templates/            # Server-rendered pages
+├─ requirements/         # Requirements (if split by envs)
+├─ scripts/              # Local helper scripts (chmod +x after clone)
 ├─ manage.py
 └─ README.md
 ```
 
-Key parts you’ll likely look for:
+Key places to look at:
 
-- `users/models.py` – `CustomUser` + `CustomUserManager` (`create_user`, `create_superuser`)
-- `users/backends.py` – `PhoneBackend` for phone + password authentication
-- `core/settings.py` – `AUTH_USER_MODEL` and `AUTHENTICATION_BACKENDS` wiring
-- `templates/` – basic forms and navigation (Login / Register / Update / Delete)
+- `users/models.py` – `CustomUser` with `phone_number` as the identifier  
+- `users/backends.py` – `PhoneBackend` (auth by phone + password)  
+- `core/settings.py` – `AUTH_USER_MODEL` & `AUTHENTICATION_BACKENDS` wiring  
+- `users/urls.py` & `core/urls.py` – URL configuration (with `i18n_patterns`)  
+- `templates/` – clean, minimal UI with language switcher
 
 ---
 
-## 🚀 Quickstart (Local)
+## 🚀 Quickstart
 
-### 1) Clone & create a virtual environment
+### 1) Clone & create a virtualenv
 ```bash
 git clone https://github.com/turdialixasanbayev/phone-number-auth.git
 cd phone-number-auth
@@ -54,168 +57,278 @@ python -m venv .venv && source .venv/bin/activate
 
 ### 2) Install dependencies
 ```bash
-pip install -r requirements.txt  # or use requirements/base.txt if provided
-# If there is a requirements/ directory with multiple files, use the appropriate one:
+# If a consolidated requirements file exists
+pip install -r requirements.txt
+
+# Or, if split by envs:
 # pip install -r requirements/base.txt
 ```
 
-> If you don’t have a consolidated `requirements.txt`, you can export one later with:
-> ```bash
-> pip freeze > requirements.txt
-> ```
-
 ### 3) Environment variables
-Create a `.env` in the project root (or set these directly in your environment).
+Create a `.env` in the project root (or set these in your environment):
 
-```bash
-# .env
+```dotenv
 SECRET_KEY=change-me
 DEBUG=True
 ALLOWED_HOSTS=*
 ```
 
-In `core/settings.py`, make sure these are set (already configured in this project, but shown here for clarity):
-
+Ensure these settings exist in `core/settings.py` (they typically already do in this project):
 ```python
 AUTH_USER_MODEL = "users.CustomUser"
-
 AUTHENTICATION_BACKENDS = [
-    "users.backends.PhoneBackend",                         # phone + password
-    "django.contrib.auth.backends.ModelBackend",           # admin & default
+    "users.backends.PhoneBackend",               # phone + password
+    "django.contrib.auth.backends.ModelBackend"  # default/admin
 ]
 ```
 
-### 4) Apply migrations & run
+### 4) Migrate & run
 ```bash
 python manage.py makemigrations
 python manage.py migrate
 python manage.py runserver
 ```
+Visit: http://127.0.0.1:8000/
 
-Visit: `http://127.0.0.1:8000/`
+> **Tip:** after cloning, make helper scripts executable:
+> ```bash
+> chmod 755 scripts/*  # or: chmod +x scripts/*
+> ```
 
 ---
 
-## 🔑 Creating a Superuser (by phone number)
+## 🔐 Creating a superuser
 
 Use your phone number as the unique identifier:
-
 ```bash
-python manage.py createsuperuser --phone_number +998901234567
-# You will be prompted for a password
+python manage.py createsuperuser
+# Fill prompts (phone_number + password)
 ```
-
-If your Django prompts are different, it’s because your `CustomUserManager` defines which fields are required for superuser creation. Adjust accordingly (e.g., it may ask interactively).
+> Depending on your `CustomUserManager`, you may also be able to pass `--phone_number +998...` from CLI. If not, the interactive prompts will ask for it.
 
 ---
 
-## 🧭 URLs (typical)
+## 🔌 How the Phone Backend works
 
-> Exact paths may differ slightly based on your `users/urls.py` – below is the expected shape used in templates.
+`users/backends.PhoneBackend` usually:
 
-- `GET /` – Home page
-- `GET|POST /users/auth/register/` – Register
-- `GET|POST /users/auth/login/` – Log in
-- `POST /users/auth/logout/` – Log out
-- `GET|POST /users/profile/update/` – Update profile (phone or password)
-- `POST /users/profile/delete/` – Delete profile
+1. Accepts `phone_number` and `password` from the login form
+2. Normalizes the phone number (strip spaces, unify format)
+3. Fetches the user by `phone_number`
+4. Checks password: `user.check_password(password)`
+5. Returns the user (or `None`)
 
-Templates show a header like:
-
-```html
-{% if user.is_authenticated %}
-  <h1>Welcome, {{ user.phone_number }} 👋</h1>
-  <a href="{% url 'logout' %}">Logout</a>
-  <a href="{% url 'update' %}">Update Profile</a>
-  <a href="{% url 'delete' %}">Delete Profile</a>
-{% else %}
-  <a href="{% url 'login' %}">Login</a>
-  <a href="{% url 'register' %}">Register</a>
-{% endif %}
-```
-
----
-
-## 🛠️ How the Phone Backend Works
-
-`users/backends.PhoneBackend` typically does:
-
-1. Accept a `phone_number` and `password` from the login form.
-2. Normalize the phone number (strip spaces, optional country code handling).
-3. Query `CustomUser` by `phone_number`.
-4. Validate `password` with `user.check_password(...)` and return the user.
-
-This allows you to keep all Django auth features (sessions, `login()`, permissions, admin) but key off the phone number instead of a username/email.
-
----
-
-## 🧪 Common Issues & Fixes
-
-### “You have multiple authentication backends configured…”
-**Error:**  
-```
-ValueError: You have multiple authentication backends configured and therefore must
-provide the `backend` argument or set the `backend` attribute on the user.
-```
-**Why it happens:** Django can’t infer which backend authenticated the user.
-
-**Fix:** Always authenticate with the backend and use that backend when logging in:
+**Usage in a view:**
 ```python
 from django.contrib.auth import authenticate, login
 
-user = authenticate(request, phone_number=phone, password=pw)  # uses PhoneBackend
+user = authenticate(request, phone_number=phone, password=pw)  # routed to PhoneBackend
 if user is not None:
+    # Avoid "multiple backends" error by specifying the backend explicitly
     login(request, user, backend="users.backends.PhoneBackend")
+    # redirect to home
 ```
-Also make sure `AUTHENTICATION_BACKENDS` includes both your phone backend **and** `ModelBackend` (admin fallback).
 
-### Admin login fails with phone number
-Use your **superuser phone number** and password. If you added staff via Admin with no password, set one:
+**Updating password without logging the user out:**
+```python
+from django.contrib.auth import update_session_auth_hash
+
+request.user.set_password(new_password)
+request.user.save()
+update_session_auth_hash(request, request.user)  # keep session alive
+```
+
+**Changing phone or password in one form:** simply conditionally set the fields that were provided, then save.
+
+---
+
+## 🌍 Internationalization (i18n)
+
+This project is set up to translate server‑rendered content (templates/messages).
+
+### Settings checklist
+```python
+# core/settings.py
+
+LANGUAGE_CODE = "en"
+TIME_ZONE = "Asia/Tashkent"
+
+LANGUAGES = [
+    ("uz", "Uzbek"),
+    ("en", "English"),
+    ("ru", "Russian"),
+    ("tr", "Turkish"),
+]
+
+LOCALE_PATHS = [BASE_DIR / "locale"]
+
+MIDDLEWARE = [
+    # ...
+    "django.middleware.locale.LocaleMiddleware",
+    # ...
+]
+
+TEMPLATES = [
+    {
+        # ...
+        "OPTIONS": {
+            "context_processors": [
+                # ...
+                "django.template.context_processors.i18n",
+            ],
+        },
+    },
+]
+```
+
+### URL configuration
+```python
+# core/urls.py
+from django.conf.urls.i18n import i18n_patterns
+from django.urls import path, include, re_path
+from django.conf import settings
+from django.views.static import serve
+
+urlpatterns = [
+    path("i18n/", include("django.conf.urls.i18n")),  # set_language endpoint
+    re_path(r"^media/(?P<path>.*)$", serve, {"document_root": settings.MEDIA_ROOT}),
+    re_path(r"^static/(?P<path>.*)$", serve, {"document_root": settings.STATIC_ROOT}),
+]
+
+urlpatterns += i18n_patterns(
+    path("", include("users.urls")),  # localize only site URLs (not admin)
+)
+```
+
+### Language switcher (template)
+```html
+<form action="{% url 'set_language' %}" method="post" class="flex items-center space-x-2">
+    {% csrf_token %}
+    <select name="language"
+        class="px-3 py-2 rounded-lg border border-gray-300 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <option value="uz" {% if LANGUAGE_CODE == 'uz' %}selected{% endif %}>🇺🇿 Uzbek</option>
+        <option value="en" {% if LANGUAGE_CODE == 'en' %}selected{% endif %}>🇬🇧 English</option>
+        <option value="ru" {% if LANGUAGE_CODE == 'ru' %}selected{% endif %}>🇷🇺 Русский</option>
+        <option value="tr" {% if LANGUAGE_CODE == 'tr' %}selected{% endif %}>🇹🇷 Türkçe</option>
+    </select>
+    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700">
+        {% trans "Change" %}
+    </button>
+</form>
+```
+
+### Working with `.po` files
 ```bash
-python manage.py changepassword <phone_number>
+# Generate messages for multiple languages
+django-admin makemessages -l uz -l en -l ru -l tr
+
+# Compile after editing translations
+django-admin compilemessages
 ```
 
-### Phone number format
-Be consistent (e.g., E.164: `+998...`). If you accept local formats on forms, normalize to one canonical format in `clean()` or the backend before querying.
+> For static/template strings, use `{% trans "..." %}` or `{% blocktrans %}...{% endblocktrans %}`.
 
 ---
 
-## 📦 Extending This Project
+## 🧩 Optional: Translating DB fields with `django-modeltranslation`
 
-- **OTP/SMS verification**: add a `PhoneOTP` model and integrate a provider (Twilio/PlayMobile) to send & verify codes.
-- **Rate limiting**: throttle login and OTP requests (django-ratelimit).
-- **Audit & security**: add login attempt logs, 2FA, and password validation policies.
-- **Internationalization**: translate templates and messages.
-- **API**: expose DRF endpoints for mobile clients.
-- **Testing**: add unit tests for `PhoneBackend` and forms.
+If you **also** need to translate fields stored in the database (e.g., a `title` or `bio`), you can add `django-modeltranslation`.
+
+1) Install and add to settings:
+```bash
+pip install django-modeltranslation
+```
+```python
+INSTALLED_APPS = [
+    # ...
+    "modeltranslation",
+]
+MODELTRANSLATION_DEFAULT_LANGUAGE = "en"
+MODELTRANSLATION_LANGUAGES = ("uz", "en", "ru", "tr")
+```
+
+2) Create `translation.py` in the app with the model you want to translate:
+```python
+# example: users/translation.py
+from modeltranslation.translator import register, TranslationOptions
+from .models import Profile  # example model with a 'bio' field
+
+@register(Profile)
+class ProfileTranslationOptions(TranslationOptions):
+    fields = ("bio",)  # will create bio_uz, bio_en, bio_ru, bio_tr
+```
+
+3) Make migrations & migrate:
+```bash
+python manage.py makemigrations
+python manage.py migrate
+```
+
+> If your project only translates **static template strings**, you can skip `django-modeltranslation` entirely and rely on Django’s built‑in i18n.
 
 ---
 
-## 🧰 Tech Stack
+## 🧱 Endpoints (typical)
 
-- **Python & Django**
-- **SQLite** for local development (switch to Postgres/MySQL in production)
-- **Django templates** for the UI
+> Exact names may vary; check `users/urls.py` in your repo.
+
+- `GET /` — Home
+- `GET|POST /users/auth/register/` — Register
+- `GET|POST /users/auth/login/` — Login
+- `POST /users/auth/logout/` — Logout
+- `GET|POST /users/profile/update/` — Update phone/password
+- `POST /users/profile/deactivate/` — Deactivate account
+- `POST /users/profile/reactivate/` — Reactivate account
+- `POST /users/profile/delete/` — Hard delete account
+
+---
+
+## 🔒 Security notes
+
+- Always call `login(request, user, backend="users.backends.PhoneBackend")` after `authenticate(...)` to avoid “multiple backends” issues.
+- Normalize phone numbers (e.g., E.164) before lookup to avoid duplicates.
+- When changing password, call `update_session_auth_hash(...)` to keep the session.
+- Add password validation & rate‑limiting (e.g., `AUTH_PASSWORD_VALIDATORS`, `django-ratelimit`).
+- Consider OTP/SMS to verify ownership of the phone number.
+
+---
+
+## 🧪 Extending
+
+- OTP/SMS verification (Twilio, PlayMobile, etc.)
+- Password reset via phone (SMS code)
+- DRF endpoints for mobile apps
+- CI (ruff/black/isort + pytest)
+- Docker/Compose for dev
+- Admin action: “Verify phone”
 
 ---
 
 ## 📜 License
 
-Add a `LICENSE` file (MIT is common for open-source). If you intend this to be private or proprietary, specify that clearly.
+Choose a license (MIT is common for open source). Add a `LICENSE` file at the repo root.
 
 ---
 
-## 🙌 Credits
+## 👤 Author
 
-Built by **@turdialixasanbayev**.  
-Contributions, issues and feature requests are welcome!
+**Turdiali Xasanbayev** — Backend Developer  
+GitHub: [@turdialixasanbayev](https://github.com/turdialixasanbayev)
 
 ---
 
-## 🗺️ Roadmap (ideas)
+## 🙌 Acknowledgements
 
-- OTP login + “passwordless” flow
-- Password reset by phone (via SMS code)
-- Admin action to “Verify phone”
-- Dockerfile + Compose for dev
-- CI checks (ruff/black/isort + pytest)
+- Django documentation for Auth & i18n
+- Community examples of custom authentication backends
+
+---
+
+## 📎 Appendix
+
+### Make scripts executable
+```bash
+chmod 755 scripts/*
+# or:
+chmod +x scripts/*
+```
