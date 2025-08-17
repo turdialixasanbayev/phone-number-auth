@@ -1,9 +1,12 @@
+{% load i18n %}
+
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
-    <title>Update Profile</title>
+    <title>{% trans "Update Profile" %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         body {
@@ -99,30 +102,32 @@
 
 <body>
     <div class="form-container">
-        <h2>Update Profile</h2>
+        {% include 'base/language.html' %}
+
+        <h2>{% trans "Update Profile" %}</h2>
 
         <form method="post">
             {% csrf_token %}
 
             <!-- Telefon raqam -->
-            <label for="current_phone_number">Current Phone Number</label>
+            <label for="current_phone_number">{% trans "Current Phone Number" %}</label>
             <input type="text" name="current_phone_number" id="current_phone_number"
-                placeholder="Enter current phone number">
+                placeholder="{% trans "Enter current phone number" %}">
 
-            <label for="phone_number">New Phone Number</label>
+            <label for="phone_number">{% trans "New Phone Number" %}</label>
             <input type="text" name="phone_number" id="phone_number" placeholder="{{ user.phone_number }}">
 
             <!-- Parol -->
-            <label for="current_password">Current Password</label>
-            <input type="password" name="current_password" id="current_password" placeholder="Enter current password">
+            <label for="current_password">{% trans "Current Password" %}</label>
+            <input type="password" name="current_password" id="current_password" placeholder="{% trans "Enter current password" %}">
 
-            <label for="password">New Password</label>
-            <input type="password" name="password" id="password" placeholder="Enter new password">
+            <label for="password">{% trans "New Password" %}</label>
+            <input type="password" name="password" id="password" placeholder="{% trans "Enter new password" %}">
 
-            <label for="confirm_password">Confirm New Password</label>
-            <input type="password" name="confirm_password" id="confirm_password" placeholder="Confirm new password">
+            <label for="confirm_password">{% trans "Confirm New Password" %}</label>
+            <input type="password" name="confirm_password" id="confirm_password" placeholder="{% trans "Confirm new password" %}">
 
-            <button type="submit">Update</button>
+            <button type="submit">{% trans "Update" %}</button>
         </form>
 
         <!-- Xabarlar -->

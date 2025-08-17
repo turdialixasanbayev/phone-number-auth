@@ -21,20 +21,25 @@ from django.conf.urls.static import static
 from django.views.static import serve
 from .page_not_found import PageNotFoundView
 from django.conf.urls import handler404
+from django.conf.urls.i18n import i18n_patterns
 
 urlpatterns = [
-    path('phone-number-auth/', admin.site.urls),
+    path('i18n/', include('django.conf.urls.i18n')),
 
-    path(
-        '',
-        include('users.urls')
-    ),
+    path('phone-number-auth/', admin.site.urls),
 
     re_path(r'^media/(?P<path>.*)$', serve,
             {'document_root': settings.MEDIA_ROOT}),
     re_path(r'^static/(?P<path>.*)$', serve,
             {'document_root': settings.STATIC_ROOT}),
 ]
+
+urlpatterns += i18n_patterns(
+    path(
+        '',
+        include('users.urls')
+    ),
+)
 
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL,

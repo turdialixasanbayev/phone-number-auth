@@ -1,9 +1,11 @@
+{% load i18n %}
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
-    <title>Home Page</title>
+    <title>{% trans "Home Page" %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         body {
@@ -49,30 +51,32 @@
 
 <body>
     <header>
-        {% if user.is_authenticated %}
-        <h1>Welcome {{ user.phone_number }} 👋</h1>
-        <p>You are successfully logged in.</p>
+        {% include 'base/language.html' %}
 
-        <a href="{% url 'logout' %}" class="button">Logout</a>
-        <a href="{% url 'update' %}" class="button">Update Profile</a>
-        <a href="{% url 'delete' %}" class="button">Delete Profile</a>
+        {% if user.is_authenticated %}
+        <h1>{% trans "Welcome" %} {{ user.phone_number }} 👋</h1>
+        <p>{% trans "You are successfully logged in." %}</p>
+
+        <a href="{% url 'logout' %}" class="button">{% trans "Logout" %}</a>
+        <a href="{% url 'update' %}" class="button">{% trans "Update Profile" %}</a>
+        <a href="{% url 'delete' %}" class="button">{% trans "Delete Profile" %}</a>
 
         {% if user.status == 'active' %}
-        <a href="{% url 'deactivate' %}" class="button">Deactivate Account</a>
+        <a href="{% url 'deactivate' %}" class="button">{% trans "Deactivate Account" %}</a>
         {% elif user.status == 'deactive' %}
-        <a href="{% url 'reactivate' user.id %}" class="button">Reactivate Account</a>
+        <a href="{% url 'reactivate' user.id %}" class="button">{% trans "Reactivate Account" %}</a>
         {% endif %}
 
         {% else %}
-        <h1>Welcome to {{ site_name }} 🌐</h1>
-        <p>Please log in or create an account to continue.</p>
-        <a href="{% url 'login' %}" class="button">Login</a>
-        <a href="{% url 'register' %}" class="button">Register</a>
+        <h1>{% trans "Welcome to" %} {{ site_name }} 🌐</h1>
+        <p>{% trans "Please log in or create an account to continue." %}</p>
+        <a href="{% url 'login' %}" class="button">{% trans "Login" %}</a>
+        <a href="{% url 'register' %}" class="button">{% trans "Register" %}</a>
         {% endif %}
     </header>
 
     <footer>
-        <p>&copy; {{ current_year }} {{ site_name }} - All Rights Reserved</p>
+        <p>&copy; {{ current_year }} {{ site_name }} - {% trans "All Rights Reserved" %}</p>
     </footer>
 </body>
 
