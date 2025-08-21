@@ -25,6 +25,11 @@ def update_profile(request):
                         request, "Current phone number is incorrect ❌")
                     return redirect("update")
 
+                if new_phone == user.phone_number:
+                    messages.error(
+                        request, "New phone number cannot be the same as current phone number ❌")
+                    return redirect("update")
+
             # Telefon raqam formati tekshirish (oddiy misol: faqat raqamlar va +)
             if not re.match(r'^\+?\d{9,15}$', new_phone):
                 messages.error(request, "Invalid phone number format ❌")
@@ -54,6 +59,11 @@ def update_profile(request):
 
             if not new_password:
                 messages.error(request, "New password cannot be empty ❌")
+                return redirect("update")
+
+            if new_password == request.user.password:
+                messages.error(
+                    request, "New password cannot be the same as current password ❌")
                 return redirect("update")
 
             if len(new_password) < 3:
